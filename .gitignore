@@ -10,20 +10,20 @@ CTestTestfile.cmake
 _deps
 **/.DS_Store
 
-# It's nice to have the Builds folder exist, to remind us where it is
 Builds/*
 !Builds/.gitkeep
+build/*
 
-# This should never exist
+# clangd cache
+.cache/
+
 Install/*
 
-# Running CTest makes a bunch o junk
 Testing
 
-# IDE config
 .idea
 
-# clion cmake builds
+
 cmake-build-debug
 cmake-build-release
 cmake-build-relwithdebinfo

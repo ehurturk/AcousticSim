@@ -54,6 +54,8 @@ add_subdirectory(JUCE)
 # Add CLAP format
 add_subdirectory(modules/clap-juce-extensions EXCLUDE_FROM_ALL)
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 # Add any other modules you want modules here, before the juce_add_plugin call
 # juce_add_module(modules/my_module)
 
@@ -132,7 +134,7 @@ target_compile_definitions(SharedCode
     VERSION="${CURRENT_VERSION}"
 
     # JucePlugin_Name is for some reason doesn't use the nicer PRODUCT_NAME
-    PRODUCT_NAME_WITHOUT_VERSION="Pamplejuce"
+    PRODUCT_NAME_WITHOUT_VERSION="${PROJECT_NAME}"
 )
 
 # Link to any other modules you added (with juce_add_module) here!
