@@ -64,19 +64,16 @@ juce_add_plugin("${PROJECT_NAME}"
     # Icons for the standalone app
     ICON_BIG "${CMAKE_CURRENT_SOURCE_DIR}/packaging/icon.png"
 
-    # Change me!
     COMPANY_NAME "${COMPANY_NAME}"
     BUNDLE_ID "${BUNDLE_ID}"
 
     # On MacOS, plugin is copied to /Users/yourname/Library/Audio/Plug-Ins/
     COPY_PLUGIN_AFTER_BUILD TRUE
 
-    # Change me!
     # A four-character plugin id
     # First character MUST be uppercase for AU formats
     PLUGIN_MANUFACTURER_CODE Acst
 
-    # Change me!
     # A unique four-character plugin id
     # Note: this must have at least one upper-case character
     PLUGIN_CODE A001
