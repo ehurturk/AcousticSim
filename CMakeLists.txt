@@ -2,30 +2,27 @@ cmake_minimum_required(VERSION 3.25)
 
 # This tells cmake we have goodies in the /cmake folder
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
-include (PamplejuceVersion)
+include (Version)
 
 # Modern concise way to add dependencies to your project
 include (CPM)
 
 # Configures universal binaries and decides which version of macOS to support
-include(PamplejuceMacOS)
+include(MacOS)
 
 # Couple tweaks that IMO should be JUCE defaults
 include(JUCEDefaults)
 
 # Change me!
 # This is the internal name of the project and the name of JUCE's shared code target
-# Note: This cannot have spaces (it may be 2024, but you can't have it all!)
 # Worry not, JUCE's PRODUCT_NAME can have spaces (and is what DAWs display)
 set(PROJECT_NAME "AcousticSim")
 
-# Worry not, JUCE's PRODUCT_NAME can have spaces (and is what DAWs will display)
-# You can also just have it be the same thing as PROJECT_NAME
 # You may want to append the major version on the end of this (and PROJECT_NAME) ala:
 #   set(PROJECT_NAME "MyPlugin_v${MAJOR_VERSION}")
 # Doing so enables major versions to show up in IDEs and DAWs as separate plugins
 # allowing you to change parameters and behavior without breaking existing user projects
-set(PRODUCT_NAME "AcousticSim Demo")
+set(PRODUCT_NAME "AcousticSim")
 
 # Change me! Used for the MacOS bundle name and Installers
 set(COMPANY_NAME "EHurturk")
@@ -140,7 +137,6 @@ target_compile_definitions(SharedCode
 # Link to any other modules you added (with juce_add_module) here!
 # Usually JUCE modules must have PRIVATE visibility
 # See https://github.com/juce-framework/JUCE/blob/master/docs/CMake%20API.md#juce_add_module
-# However, with Pamplejuce, you'll link modules to SharedCode with INTERFACE visibility
 # This allows the JUCE plugin targets and the Tests target to link against it
 target_link_libraries(SharedCode
     INTERFACE
@@ -161,7 +157,7 @@ target_link_libraries(SharedCode
 target_link_libraries("${PROJECT_NAME}" PRIVATE SharedCode)
 
 # IPP support, comment out to disable
-include(PamplejuceIPP)
+include(IPP)
 
 # Everything related to the tests target
 include(Tests)
@@ -171,3 +167,52 @@ include(Benchmarks)
 
 # Output some config for CI (like our PRODUCT_NAME)
 include(GitHubENV)
+
+if(APPLE)
+  # Where we'll stage files for the DMG (inside the repo; add to .gitignore)
+  set(DMG_STAGE_DIR "${CMAKE_SOURCE_DIR}/packaging/dmg")
+
+  # Product name used in artefact filenames (JUCE uses PRODUCT_NAME)
+  set(_PN "${PRODUCT_NAME}")
+
+  # Try to find appdmg
+  find_program(APPDMG appdmg)
+  if(NOT APPDMG)
+    message(STATUS "appdmg not found. Install with: npm install -g appdmg")
+    set(APPDMG "appdmg") # let it fail with a nice error if still missing
+  endif()
+
+  # A helper custom target to copy built artefacts into packaging/dmg/
+  add_custom_target(stage_dmg ALL
+    COMMAND ${CMAKE_COMMAND} -E rm -rf "${DMG_STAGE_DIR}"
+    COMMAND ${CMAKE_COMMAND} -E make_directory "${DMG_STAGE_DIR}"
+
+    # Standalone app (bundle dir)
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+            "${CMAKE_BINARY_DIR}/${PROJECT_NAME}_artefacts/$<CONFIG>/Standalone/${_PN}.app"
+            "${DMG_STAGE_DIR}/${_PN}.app"
+
+    # AU (bundle dir) — comment out if you didn't build AU
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+            "${CMAKE_BINARY_DIR}/${PROJECT_NAME}_artefacts/$<CONFIG>/AU/${_PN}.component"
+            "${DMG_STAGE_DIR}/${_PN}.component"
+
+    # VST3 (bundle dir) — comment out if you didn't build VST3
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+            "${CMAKE_BINARY_DIR}/${PROJECT_NAME}_artefacts/$<CONFIG>/VST3/${_PN}.vst3"
+            "${DMG_STAGE_DIR}/${_PN}.vst3"
+
+    BYPRODUCTS "${DMG_STAGE_DIR}"
+    DEPENDS "${PROJECT_NAME}_Standalone" "${PROJECT_NAME}_AU" "${PROJECT_NAME}_VST3"
+    VERBATIM
+  )
+
+  # Build the DMG using your existing JSON
+  add_custom_target(dmg
+    COMMAND ${APPDMG} "${CMAKE_SOURCE_DIR}/packaging/dmg.json"
+                      "${CMAKE_BINARY_DIR}/${PROJECT_NAME}-$<CONFIG>.dmg"
+    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/packaging"
+    DEPENDS stage_dmg
+    VERBATIM
+  )
+endif()

@@ -3,8 +3,6 @@
 
 /* This is a helper function to run tests within the context of a plugin editor.
  *
- * Read more here: https://github.com/sudara/pamplejuce/issues/18#issuecomment-1425836807
- *
  * Example usage (screenshots the plugin)
  *
   runWithinPluginEditor ([&] (PluginProcessor& plugin) {

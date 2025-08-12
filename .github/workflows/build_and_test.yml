@@ -1,4 +1,4 @@
-name: Pamplejuce
+name: AcousticSim 
 
 on:
   workflow_dispatch: # lets you run a build from the UI
@@ -39,13 +39,13 @@ jobs:
             os: ubuntu-22.04
             pluginval-binary: ./pluginval
             extra-flags: -G Ninja
-          - name: macOS
-            os: macos-14
-            pluginval-binary: pluginval.app/Contents/MacOS/pluginval
-            extra-flags: -G Ninja -DCMAKE_OSX_ARCHITECTURES="arm64;x86_64"
-          - name: Windows
-            os: windows-latest
-            pluginval-binary: ./pluginval.exe
+          # - name: macOS
+          #   os: macos-14
+          #   pluginval-binary: pluginval.app/Contents/MacOS/pluginval
+          #   extra-flags: -G Ninja -DCMAKE_OSX_ARCHITECTURES="arm64;x86_64"
+          # - name: Windows
+          #   os: windows-latest
+          #   pluginval-binary: ./pluginval.exe
 
     steps:
       # Setup MSVC toolchain and developer command prompt (Windows)
@@ -102,7 +102,7 @@ jobs:
         working-directory: ${{ env.BUILD_DIR }}
         run: ctest --verbose --output-on-failure
 
-      - name: Read in .env from CMake # see GitHubENV.cmake
+      - name: Read in .env from CMake 
         run: |
           cat .env # show us the config
           cat .env >> $GITHUB_ENV # pull in our PRODUCT_NAME, etc
