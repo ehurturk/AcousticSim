@@ -1,0 +1,16 @@
+# When present, use Intel IPP for performance on Windows
+if (WIN32) # Can't use MSVC here, as it won't catch Clang on Windows
+    find_package(IPP)
+    set (IPP_ROOT "$ENV{USERPROFILE}/.nuget/packages/intelipp.static.win-x64/2022.2.0.575")
+    if (IS_DIRECTORY "${IPP_ROOT}")
+        set(IPP_INC "${IPP_ROOT}/build/native/include/ipp")
+        set(IPP_LIB "${IPP_ROOT}/build/native/win-x64/")
+        target_include_directories(SharedCode INTERFACE "${IPP_INC}")
+        target_link_directories(SharedCode INTERFACE "${IPP_LIB}")
+        target_link_libraries(SharedCode INTERFACE ippsmt ippcoremt ippimt ippcvmt ippvmmt)
+        message("INTEL IPP FOUND")
+        target_compile_definitions(SharedCode INTERFACE PAMPLEJUCE_IPP=1)
+    else ()
+        message("INTEL IPP NOT LOADED: IPP_ROOT *NOT* FOUND")
+    endif ()
+endif ()
