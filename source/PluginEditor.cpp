@@ -4,7 +4,6 @@ PluginEditor::PluginEditor (PluginProcessor& p)
     : AudioProcessorEditor (&p), processorRef (p)
 {
     juce::ignoreUnused (processorRef);
-
     addAndMakeVisible (inspectButton);
 
     // this chunk of code instantiates and opens the melatonin inspector
@@ -43,6 +42,6 @@ void PluginEditor::resized()
 {
     // layout the positions of your child components here
     auto area = getLocalBounds();
-    area.removeFromBottom(50);
-    inspectButton.setBounds (getLocalBounds().withSizeKeepingCentre(100, 50));
+    area.removeFromBottom (50);
+    inspectButton.setBounds (getLocalBounds().withSizeKeepingCentre (100, 50));
 }
