@@ -18,6 +18,13 @@ To build DMG release, run:
 cmake --build ./build --target dmg --config Release
 ```
 
+# TODO
+1) Fix segfault for early L/R stereo channels - convert to mono?
+2) Add graphical EQ for tone shaping
+3) Body IR test
+4) Implement body reverb
+5) Incorporate LSTM model with custom IR
+
 # Notes
 
 Original intention was to use LSTM32 model for real time inference of electric to acoustic signal conversion.
